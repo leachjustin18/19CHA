@@ -138,8 +138,7 @@
 	//Check if answer selected is correct or not
 	function checkAnswers(scenarioQuestions) {
 		$sel.buttonImages.on('click', function() {
-			var $this = $(this),
-				id = parseInt(this.id),
+				var id = parseInt(this.id),
 				alt = this.alt;
 			for(var a = 0; a < scenarioQuestions.answer.correct.length; a++) {
 				if(id === scenarioQuestions.answer.correct[a]) {
