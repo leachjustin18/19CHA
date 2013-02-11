@@ -1,0 +1,211 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" type="text/css" href="media/main.css">
+    </head>
+    <body>
+       <div id="wrapper">
+<div id="knowledgeCheck">Knowledge Check</div>
+<div id="questions">Question <span id="questionOfNumber">1</span> of <span id="totalAmountOfQuestions"></span></div>
+<div class="instructions topInstructions">Click one of the buttons below to match the following definition.</div>
+<div id="definitions"><div id="definitionText" number =""></div></div>
+
+<div class="preventClick hidden"></div>
+<div id="centerImages">
+<img src="media/pages/convection.png" rel="media/pages/convection.png" id="0" class="buttonMarginBottom" alt="convection" />
+<img src="media/pages/conduction.png" rel="media/pages/conduction.png" id="1" class="buttonMarginBottom" alt="conduction" />
+<img src="media/pages/radiation.png" rel="media/pages/radiation.png" id="2" class="buttonMarginBottom" alt="radiation" />
+<img src="media/pages/evaporation.png" rel="media/pages/evaporation.png" id="3" class="buttonMarginBottom" alt="evaporation" />
+</div>
+
+<div id="buttonHints">
+<div class="instructions">Hover of each term above for a hint.</div>
+<div class="hint"></div>
+</div>
+
+<input type="submit" class="hidden" value="Next Question" id="nextQuestion" />
+<div id="correctIncorrect"></div>
+</div>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script type="text/javascript" charset="utf-8" async>
+(function() {
+
+	var $sel = {
+		buttonImages: $('.buttonMarginBottom'),
+		buttonHints: $('.hint'),
+		definitions: $('#definitions'),
+		preventClick: $('.preventClick'),
+		nextQuestion: $('#nextQuestion'),
+		questionOfNumber: $('#questionOfNumber'),
+		totalAmountOfQuestions: $('#totalAmountOfQuestions'),
+		correctIncorrect: $('#correctIncorrect')
+	}
+
+	var scenarios = {
+		hints: [{
+			hint: 'The transfer of heat between a solid surface and air or liquid.'
+		}, {
+			hint: 'The transfer of heat between two solid surfaces when they are in contact.'
+		}, {
+			hint: 'The transfer of heat via electromagnetic infrared waves between solid surfaces not in contact with each other.'
+		}, {
+			hint: 'The loss of heat from energy use in converting water into gas.'
+		}],
+		questions: [{
+			definition: 'Reduce exposed skin surface area by using blankets.',
+			answer: {
+				correct: [0]
+			}
+		}, {
+			definition: 'Ensure ambient temperature is not drastically different around newborn\'\s bedside.',
+			answer: {
+				correct: [2]
+			}
+		}, {
+			definition: 'Use warmed blankets/pads.',
+			answer: {
+				correct: [1]
+			}
+		}, {
+			definition: 'Monitor for areas of skin damage or breakdown.',
+			answer: {
+				correct: [3]
+			}
+		}, {
+			definition: 'Monitor for overheating.',
+			answer: {
+				correct: [3]
+			}
+		}, {
+			definition: 'Decrease exposure to drafts.',
+			answer: {
+				correct: [0]
+			}
+		}, {
+			definition: 'Use a radiant warmer to maintain heat .',
+			answer: {
+				correct: [2]
+			}
+		}, {
+			definition: 'Pre-heat all surfaces with which the newborm comes in&nbsp;contact.',
+			answer: {
+				correct: [1]
+			}
+		}, {
+			definition: 'Use insulated covers over incubators.',
+			answer: {
+				correct: [3]
+			}
+		}, {
+			definition: 'Warm oxygen used in oxygen hoods.',
+			answer: {
+				correct: [0]
+			}
+		}]
+	}
+
+	var questionNumber = 0;
+
+	//Fire off the init function to start the quiz and the ability to get hints
+	init();
+
+	//Function that animates if the user is correct or incorrect
+	var correctIncorrect = function(corrIncorrText) {
+			$sel.correctIncorrect.text(corrIncorrText);
+			$sel.correctIncorrect.animate({
+				opacity: 1
+			}, function() {
+				$sel.correctIncorrect.animate({
+					opacity: 0
+				});
+			});
+		}
+
+	function init() {
+		loadScenario(questionNumber);
+		definitionHint();
+	}
+
+	//Load definitions within definitionText id and show the totaly amount of questions
+	function loadScenario(questionNumber) {
+		$sel.totalAmountOfQuestions.text(scenarios.questions.length);
+		var scenarioQuestions = scenarios.questions[questionNumber];
+		$('#definitionText').html(scenarioQuestions.definition);
+		checkAnswers(scenarioQuestions);
+	}
+
+	//Check if answer selected is correct or not
+	function checkAnswers(scenarioQuestions) {
+		$sel.buttonImages.on('click', function() {
+			var $this = $(this),
+				id = parseInt(this.id),
+				alt = this.alt;
+			for(var a = 0; a < scenarioQuestions.answer.correct.length; a++) {
+				if(id === scenarioQuestions.answer.correct[a]) {
+					$sel.definitions.removeClass('incorrect').addClass('correct');
+					//Once the answer is correct show others as 'inactive' and the correct one as 'active'
+					$sel.buttonImages.each(function() {
+						var $this = $(this),
+							altImage = $this.attr('alt');
+						$this.prop('src', 'media/pages/' + altImage + '_over.png');
+					});
+					$this.prop('src', $(this).attr('rel'));
+					$sel.preventClick.removeClass('hidden');
+					//Visual confirmtion user got answer correct
+					correctIncorrect('Correct!');
+					//Test if questionNumber + 1 is less then the amount of questions. If false, it will not show next question
+					if(questionNumber + 1 < scenarios.questions.length) {
+						$sel.nextQuestion.removeClass('hidden');
+					}
+
+				} else {
+					$sel.definitions.addClass('incorrect');
+					$this.prop('src', 'media/pages/' + alt + '_over.png');
+					//Visual let the user know to try again
+					correctIncorrect('Please try again');
+				}
+			}
+		});
+	}
+
+	$sel.nextQuestion.click(function() {
+		//Clear the array of the last correct answer.
+		scenarios.questions[questionNumber].answer.correct = [];
+		//Clear the definition from building up in the DOM
+		scenarios.questions[questionNumber].definition = [];
+
+		questionNumber++;
+		$sel.preventClick.addClass('hidden');
+		$sel.definitions.removeClass('correct');
+		$sel.nextQuestion.addClass('hidden');
+
+		$sel.questionOfNumber.text(questionNumber + 1)
+		$sel.buttonImages.each(function() {
+			var $this = $(this),
+				altImage = $this.attr('alt');
+			$this.prop('src', 'media/pages/' + altImage + '.png');
+		});
+		loadScenario(questionNumber);
+	});
+
+	//When hovering will show hint for different selections 
+	function definitionHint() {
+		$sel.buttonImages.hover(function() {
+			var id = this.id;
+			$sel.buttonHints.text(scenarios.hints[id].hint);
+		}, function() {
+			$sel.buttonHints.empty();
+		});
+	}
+
+	function preload(arrayOfImages) {
+		$(arrayOfImages).each(function() {
+			$('<img/>')[0].src = this;
+		});
+	};
+	preload(['media/pages/convection.png', 'media/pages/convection_over.png', 'media/pages/conduction.png', 'media/pages/conduction_over.png', 'media/pages/radiation.png', 'media/pages/radiation_over.png', 'media/pages/evaporation.png', 'media/pages/evaporation_over.png', 'media/pages/nurse_quote.png']);
+})();
+</script>
+    </body>
+</html>	
