@@ -139,7 +139,8 @@
 	function checkAnswers(scenarioQuestions) {
 		$sel.buttonImages.on('click', function() {
 				var id = parseInt(this.id),
-				alt = this.alt;
+				alt = this.alt, 
+				$this = $(this);
 			for(var a = 0; a < scenarioQuestions.answer.correct.length; a++) {
 				if(id === scenarioQuestions.answer.correct[a]) {
 					$sel.definitions.removeClass('incorrect').addClass('correct');
